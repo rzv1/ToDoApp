@@ -1,0 +1,145 @@
+body{
+    margin: 0;
+    font-family: "Inter";
+}
+
+.page{
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    grid-template-rows: 100vh; 
+}
+
+.fullView{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 2fr 1fr;
+    gap: 20px;
+    justify-content: center;
+    text-align: center;
+}
+
+.container{
+    padding: 20px;
+    border-radius: 5px;
+    background-color: rgba(192, 192, 192, 0.445);
+}
+
+.icon{
+    padding: 10px;
+    text-align: left;
+    background-color: rgb(238, 238, 238);
+    border-radius: 5px;
+}
+
+.icon-selected{
+    border-left: 3px solid orange;
+}
+
+.container-icons{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.container-header{
+    font-weight: 400;
+    font-size: 20px;
+    margin-bottom: 25px;
+}
+
+h3 {
+    font-weight: 300;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.dashboard{
+    background-color: rgba(191, 191, 191, 0.452);
+    padding: 45px 40px;
+}
+
+.cards{
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+}
+
+.card{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.content{
+    background-color: rgb(244, 244, 244);
+    border-left: 1px solid rgba(128, 128, 128, 0.267);
+    padding: 45px 40px;
+}
+
+.selected{
+    background-color: rgba(218, 218, 218, 0.623);
+    width: 100%;
+    padding: 0px 20px;
+    transition: all .5s ease;
+}
+
+.todos{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    text-align: left;
+}
+
+label{
+    display: flex;
+    font-size: 14px;
+    padding: 5px;
+    align-items: center;
+}
+
+input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+}
+
+input{
+    margin-right: 10px;
+}
+
+.title{
+    font-size: 24px;
+    font-weight: 500;
+}
+
+input[type="text"] {
+    border: 1px solid rgba(128, 128, 128, 0.295);
+    border-radius: 5px;
+}
+
+button {
+    width: 50px;
+    margin: 5px;
+}
+
+.invisible{
+    opacity: 0;
+}
+
+.remove{
+    display: none;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    margin: 0 auto;
+}
+
+form select{
+    width: 80px;
+}
+
+form button{
+    margin-top: 20px;
+    width: auto;
+}
