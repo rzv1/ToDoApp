@@ -2,7 +2,7 @@ export const repo = (function() {
     let todos = [];
     let projects = [];
 
-    const getToDos = () => todos;
+    const getToDos = (projectID) => projects.find((p) => p.id === projectID).todos || "";
     const getProjects = () => projects;
 
     function readStorage() {
@@ -18,14 +18,21 @@ export const repo = (function() {
     console.log("Done");
     }
 
-    function addToDo(toDo) {
-        todos.push(toDo);
-        populateStorage();
-    }
+    // function addToDo(toDo) {
+    //     todos.push(toDo);
+    //     populateStorage();
+    // }
 
-    function removeToDo(toDo) {
-        const index = todos.findIndex((td) => toDo.id === td.id);
-        todos.splice(index, 1);
+    // function removeToDo(id) {
+    //     const index = todos.findIndex((td) => id === td.id);
+    //     todos.splice(index, 1);
+    //     populateStorage();
+    // }
+
+    function removeToDoFromProject(toDoID, projectID) {
+        const indexProject = projects.findIndex((p) => p.id === projectID);
+        const indexToDo = getToDos(projectID).findIndex((t) => t.id === toDoID);
+        projects[indexProject].todos.splice(indexToDo, 1);
         populateStorage();
     }
 
@@ -34,17 +41,28 @@ export const repo = (function() {
         populateStorage();
     }
 
-    function addToDoToProject(toDo, project) {
-        const index = projects.findIndex((p) => p.id === project.id);
-        projects[index].addToDo(toDo);
+    function addToDoToProject(toDo, projectID) {
+        const index = projects.findIndex((p) => p.id === projectID);
+        projects[index].todos.push(toDo);
         populateStorage();
     }
 
-    function removeProject(project) {
-        const index = projects.findIndex((p) => p.id === project.id);
+    function removeProject(id) {
+        const index = projects.findIndex((p) => p.id === id);
         projects.splice(index, 1);
         populateStorage();
     }
 
-    return { readStorage, populateStorage, addProject, addToDo, getProjects, getToDos };
+    function updateState(toDoID, projectID) {
+        const indexProject = projects.findIndex((p) => p.id === projectID);
+        const indexToDo = getToDos(projectID).findIndex((t) => t.id === toDoID);
+        console.log(getToDos(projectID));
+        console.log(toDoID);
+        const state = projects[indexProject].todos[indexToDo].completed;
+        
+        projects[indexProject].todos[indexToDo].completed = !state;
+        populateStorage();
+    }
+
+    return { readStorage, addProject, updateState, addToDoToProject, getProjects, getToDos, removeProject, removeToDoFromProject };
 })();
