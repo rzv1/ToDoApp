@@ -15,7 +15,8 @@ export const controller = (function(){
             handleSelectIconTodo,
             handleDeleteProject,
             handleDeleteTodo,
-            handleTodoCheck
+            handleTodoCheck,
+            handleCompleteTodo
         });
         display.onDashboardClick(handleDashboardClick);
         repo.readStorage();
@@ -39,7 +40,17 @@ export const controller = (function(){
          }
          else if(card.classList.contains('inbox'))
              renderInbox();
+         else if(card.id === "today")
+             handleToday();
+         else if(card.id === "upcoming")
+             handleUpcoming();
+         else if(card.id == "anytime")
+             handleAnytime();
          display.selectCard(card);
+    }
+    
+    function handleToday(){
+        display.renderTodosContainer(repo.getToDos(selectedIconProj).filter(t => t.getDueDate() <= new Date()));
     }
 
     function handleAddProject(target){
@@ -90,6 +101,12 @@ export const controller = (function(){
     function handleTodoCheck(target){
         let todoId = target.dataset.id;
         repo.updateState(todoId, selectedCardProj);
+    }
+    
+    function handleCompleteTodo(target){
+        let todoId = target.dataset.id;
+        repo.updateState(todoId, selectedIconProj);
+        display.renderTodosContainer(repo.getToDos(selectedIconProj));
     }
 
     return { init };

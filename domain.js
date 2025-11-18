@@ -1,11 +1,12 @@
 import {addDays} from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
 
-export function createTodo(title, priority, dueDate = addDays(new Date(), 1), completed = false) {
+export function createTodo(title, priority, dueDate = addDays(new Date(), 1), completed = false, number = 0) {
     let _id = crypto.randomUUID();
     let _title = title;
     let _priority = priority;
     let _completed = completed;
     let _dueDate = dueDate;
+    let _number = number;
     return {
         getId: () => _id,
         getTitle: () => _title,
@@ -13,7 +14,9 @@ export function createTodo(title, priority, dueDate = addDays(new Date(), 1), co
         getDueDate: () => _dueDate,
         setDueDate: (dueDate) => { _dueDate = dueDate; },
         getCompleted: () => _completed,
-        setCompleted: (completed) => { _completed = completed; }
+        setCompleted: (completed) => { _completed = completed; },
+        getNumber: () => _number,
+        setNumber: (number) => { _number = number; }
     }
 }
 

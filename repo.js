@@ -2,6 +2,7 @@ import {createProject, createTodo} from "./domain.js";
 
 export const repo = (function() {
     let projects = [];
+    let number = 0;
 
     const getToDos = (projectID) => projects.find((p) => p.getId() === projectID).getTodos() || [];
     const getProjects = () => projects;
@@ -11,11 +12,14 @@ export const repo = (function() {
         for(let p of stored){
             let proj = createProject(p.title, p.description, p.dueDate, p.priority);
             const todos = p.todos || [];
-            for(let t of todos)
-                proj.addTodo(createTodo(t.title, t.priority, t.dueDate, t.completed));
+            for(let t of todos) {
+                proj.addTodo(createTodo(t.title, t.priority, new Date(t.dueDate), t.completed, t.number));
+                if(t.number > number) number = t.number;
+            }
             projects.push(proj);
         }
         console.log(projects);
+        number++;
     }
 
     function populateStorage() {
@@ -28,7 +32,8 @@ export const repo = (function() {
                 title: t.getTitle(),
                 priority: t.getPriority(),
                 dueDate: t.getDueDate(),
-                completed: t.getCompleted()
+                completed: t.getCompleted(),
+                number: t.getNumber()
             }))
         }));
         localStorage.setItem("projects", JSON.stringify(arr));
@@ -48,6 +53,7 @@ export const repo = (function() {
     }
 
     function addToDoToProject(toDo, projectID) {
+        toDo.setNumber(number++);
         const index = projects.findIndex((p) => p.getId() === projectID);
         projects[index].addTodo(toDo);
         populateStorage();

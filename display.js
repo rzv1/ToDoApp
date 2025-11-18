@@ -1,4 +1,4 @@
-import { intervalToDuration } from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
+import { intervalToDuration, compareAsc } from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
 
 export const display = (function() {
     const dashboard = document.querySelector('.dashboard');
@@ -103,29 +103,40 @@ export const display = (function() {
                     ToDoS
                 </div>`;
         div.classList.add("containerIcons");
+        todos.sort((a, b) => {
+            if(a.getCompleted() - b.getCompleted() !== 0)
+                return a.getCompleted() - b.getCompleted();
+            
+            return compareAsc(a.getDueDate(), b.getDueDate());
+        });
+        
         todos.forEach((t) => {
             let divChild = document.createElement("div");
             divChild.classList.add("icon");
             divChild.id = "iconTodo"; 
             divChild.dataset.id = t.getId();
+            divChild.classList.add(t.getPriority() === "high" ? "high" : (t.getPriority() === "mid" ? "mid" : "low"));
+            if(t.getCompleted() === true) divChild.classList.add("completed");
             divChild.innerHTML += `
-                    <div id="iconTodo" class="${t.getPriority() === "high" ? "high" : (t.getPriority() === "mid" ? "mid" : "low")}" data-id="${t.getId()}">
-                        ${t.getTitle()}
+                    <div class="todoNumber">#${t.getNumber()}</div>
+                    <div class="todoTitle">${t.getTitle()}</div>
+                    <div class="todoFooter">
+                        <button class="completeTodoBtn">${t.getCompleted() === true ? "Undo" : "Complete"}</button>
                         <svg xmlns="http://www.w3.org/2000/svg" class="iconSvg" id="deleteTodo" viewBox="0 0 24 24" width="20" height="20"><title>delete-circle</title><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M17,7H14.5L13.5,6H10.5L9.5,7H7V9H17V7M9,18H15A1,1 0 0,0 16,17V10H8V17A1,1 0 0,0 9,18Z" /></svg>
-                    
+                        
             `
            let dif = intervalToDuration({ start: new Date(), end: t.getDueDate() });
            if(dif.days > 0)
-               divChild.innerHTML += `<span class="dueDate">Due in ${dif.days} days ${dif.hours} hours and ${dif.minutes} minutes</span>`
+               divChild.innerHTML += `<span class="dueDate">${dif.days} days and ${dif.hours} hrs</span>`
            else if(dif.hours > 0)
-               divChild.innerHTML += `<span class="dueDate">Due in ${dif.hours} hours and ${dif.minutes} minutes</span>`
+               divChild.innerHTML += `<span class="dueDate">${dif.hours} hrs and ${dif.minutes} min</span>`
            else if(dif.minutes > 0)
-               divChild.innerHTML += `<span class="dueDate">Due in ${dif.minutes} minutes</span>`
+               divChild.innerHTML += `<span class="dueDate">${dif.minutes} min and ${dif.seconds} sec</span>`
            else if(dif.seconds > 0)
-               divChild.innerHTML += `<div class="dueDate">Due in ${dif.seconds} seconds</div>`
+               divChild.innerHTML += `<div class="dueDate">${dif.seconds} sec</div>`
            else
                divChild.innerHTML += `<div class="dueDate">Past due</div>`
-            divChild.innerHTML += `</div>`;
+            divChild.innerHTML += `</div> </div>`;
             div.appendChild(divChild);
         });
         div.innerHTML += `<div class="plus" id="addtodo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24"><title>plus-circle</title><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></div>`
@@ -182,16 +193,22 @@ export const display = (function() {
                 displayAddTodo();
             }
             else if(target.closest("#deleteProj")){
-                controller.handleDeleteProject(target);
+                if(confirm("Are you sure you want to delete this project?") === true)
+                    controller.handleDeleteProject(target);
             }
             else if(target.closest("#deleteTodo")){
-                controller.handleDeleteTodo(target);
+                if(confirm("Are you sure? This action cannot be undone.") === true)
+                    controller.handleDeleteTodo(target);
+            }
+            else if(target.closest(".completeTodoBtn")){
+                if(confirm("Are you sure?") === true)
+                    controller.handleCompleteTodo(target.closest("#iconTodo"));
             }
             else if(target.closest("#icon")){
                 controller.handleSelectIcon(target);
             }
             else if(target.closest("#iconTodo")){
-                controller.handleSelectIconTodo(target);
+                controller.handleSelectIconTodo(target.closest("#iconTodo"));
             }
             else if(target.closest("#todoCheck")){
                 controller.handleTodoCheck(target);
