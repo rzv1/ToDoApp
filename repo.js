@@ -1,4 +1,5 @@
 import {createProject, createTodo} from "./domain.js";
+import {mockup} from "./mockup.js";
 
 export const repo = (function() {
     let projects = [];
@@ -9,6 +10,10 @@ export const repo = (function() {
 
     function readStorage() {
         const stored = JSON.parse(localStorage.getItem("projects")) || [];
+        if(stored.length === 0) {
+            projects = mockup.getData();
+            return;
+        }
         for(let p of stored){
             let proj = createProject(p.title, p.description, p.dueDate, p.priority);
             const todos = p.todos || [];

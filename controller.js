@@ -1,6 +1,7 @@
 import { display } from "./display.js";
 import {createProject, createTodo} from "./domain.js";
 import {repo} from "./repo.js";
+import {setMonth} from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
 
 export const controller = (function(){
     let selectedCardProj = 0;
@@ -50,7 +51,23 @@ export const controller = (function(){
     }
     
     function handleToday(){
-        display.renderTodosContainer(repo.getToDos(selectedIconProj).filter(t => t.getDueDate() <= new Date()));
+        let todos = [];
+        repo.getProjects().forEach(p => p.getTodos().forEach(t => todos.push(t)));
+        todos = todos.filter(t => t.getDueDate() <= new Date());
+        display.renderTodayTodos(todos);
+    }
+    
+    function handleUpcoming(){
+        let todos = [];
+        repo.getProjects().forEach(p => p.getTodos().forEach(t => todos.push(t)));
+        todos = todos.filter(t => t.getDueDate() <= setMonth(new Date(), new Date().getMonth() + 1));
+        display.renderUpcomingTodos(todos);
+    }
+    
+    function handleAnytime(){
+        let todos = [];
+        repo.getProjects().forEach(p => p.getTodos().forEach(t => todos.push(t)));
+        display.renderAnytimeTodos(todos);
     }
 
     function handleAddProject(target){

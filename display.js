@@ -93,27 +93,13 @@ export const display = (function() {
         div.innerHTML += `<div class="plus" id="addproj"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24"><title>plus-circle</title><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></div>`;
         projectContainer.appendChild(div);
     }
-
-    function renderTodosContainer(todos){
-        const todoContainer = document.querySelector("#todo");
-        todoContainer.innerHTML = "";
-        let div = document.createElement("div");
-        todoContainer.innerHTML =
-            `<div class="containerHeader">
-                    ToDoS
-                </div>`;
-        div.classList.add("containerIcons");
-        todos.sort((a, b) => {
-            if(a.getCompleted() - b.getCompleted() !== 0)
-                return a.getCompleted() - b.getCompleted();
-            
-            return compareAsc(a.getDueDate(), b.getDueDate());
-        });
-        
+    
+    function renderTodos(todos, readOnly = false){
+        let div = [];
         todos.forEach((t) => {
             let divChild = document.createElement("div");
             divChild.classList.add("icon");
-            divChild.id = "iconTodo"; 
+            divChild.id = "iconTodo";
             divChild.dataset.id = t.getId();
             divChild.classList.add(t.getPriority() === "high" ? "high" : (t.getPriority() === "mid" ? "mid" : "low"));
             if(t.getCompleted() === true) divChild.classList.add("completed");
@@ -122,23 +108,77 @@ export const display = (function() {
                     <div class="todoTitle">${t.getTitle()}</div>
                     <div class="todoFooter">
                         <button class="completeTodoBtn">${t.getCompleted() === true ? "Undo" : "Complete"}</button>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="iconSvg" id="deleteTodo" viewBox="0 0 24 24" width="20" height="20"><title>delete-circle</title><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M17,7H14.5L13.5,6H10.5L9.5,7H7V9H17V7M9,18H15A1,1 0 0,0 16,17V10H8V17A1,1 0 0,0 9,18Z" /></svg>
                         
             `
-           let dif = intervalToDuration({ start: new Date(), end: t.getDueDate() });
-           if(dif.days > 0)
-               divChild.innerHTML += `<span class="dueDate">${dif.days} days and ${dif.hours} hrs</span>`
-           else if(dif.hours > 0)
-               divChild.innerHTML += `<span class="dueDate">${dif.hours} hrs and ${dif.minutes} min</span>`
-           else if(dif.minutes > 0)
-               divChild.innerHTML += `<span class="dueDate">${dif.minutes} min and ${dif.seconds} sec</span>`
-           else if(dif.seconds > 0)
-               divChild.innerHTML += `<div class="dueDate">${dif.seconds} sec</div>`
-           else
-               divChild.innerHTML += `<div class="dueDate">Past due</div>`
+            if (!readOnly)
+                divChild.innerHTML += `<svg xmlns="http://www.w3.org/2000/svg" class="iconSvg" id="deleteTodo" viewBox="0 0 24 24" width="20" height="20"><title>delete-circle</title><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M17,7H14.5L13.5,6H10.5L9.5,7H7V9H17V7M9,18H15A1,1 0 0,0 16,17V10H8V17A1,1 0 0,0 9,18Z" /></svg>`
+            let dif = intervalToDuration({ start: new Date(), end: t.getDueDate() });
+
+            if(dif.months > 0)
+                divChild.innerHTML += `<span class="dueDate">Due in ${dif.months} months and ${dif.days} days</span>`
+            else if(dif.days > 0)
+                divChild.innerHTML += `<span class="dueDate">Due in ${dif.days} days and ${dif.hours} hrs</span>`
+            else if(dif.hours > 0)
+                divChild.innerHTML += `<span class="dueDate">Due in ${dif.hours} hrs and ${dif.minutes} min</span>`
+            else if(dif.minutes > 0)
+                divChild.innerHTML += `<span class="dueDate">Due in ${dif.minutes} min and ${dif.seconds} sec</span>`
+            else if(dif.seconds > 0)
+                divChild.innerHTML += `<div class="dueDate">Due in ${dif.seconds} sec</div>`
+            else
+                divChild.innerHTML += `<div class="dueDate">Past due</div>`
             divChild.innerHTML += `</div> </div>`;
-            div.appendChild(divChild);
+            div.push(divChild);
+        }); 
+        return div;
+    }
+    
+    function renderTodayTodos(todos){
+        content.innerHTML = `<div class="containerHeader">
+                    Today Todos
+                </div>`
+        let div = document.createElement("div");
+        div.classList.add("containerIcons");
+        renderTodos(todos, true).forEach((t) => div.appendChild(t));
+        content.appendChild(div);
+    }
+    
+    function renderUpcomingTodos(todos){
+        content.innerHTML = `<div class="containerHeader">
+                    This Month Todos
+                </div>`
+        let div = document.createElement("div");
+        div.classList.add("containerIcons");
+        renderTodos(todos, true).forEach((t) => div.appendChild(t));
+        content.appendChild(div); 
+    }
+    
+    function renderAnytimeTodos(todos){
+        content.innerHTML = `<div class="containerHeader">
+                    All Todos
+                </div>`
+        let div = document.createElement("div");
+        div.classList.add("containerIcons");
+        renderTodos(todos, true).forEach((t) => div.appendChild(t));
+        content.appendChild(div);
+    }
+
+    function renderTodosContainer(todos){
+        const todoContainer = document.querySelector("#todo");
+        todoContainer.innerHTML = "";
+        let div = document.createElement("div");
+        todoContainer.innerHTML =
+            `<div class="containerHeader">
+                    ToDos
+                </div>
+                `;
+        div.classList.add("containerIcons");
+        todos.sort((a, b) => {
+            if(a.getCompleted() - b.getCompleted() !== 0)
+                return a.getCompleted() - b.getCompleted();
+            
+            return compareAsc(a.getDueDate(), b.getDueDate());
         });
+        renderTodos(todos).forEach((t) => div.appendChild(t));
         div.innerHTML += `<div class="plus" id="addtodo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24" width="24"><title>plus-circle</title><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></div>`
         todoContainer.appendChild(div);
     }
@@ -248,5 +288,5 @@ export const display = (function() {
         icon.classList.add("selectedIcon");
     }
 
-    return { renderInbox, renderProjectsDashboard, renderProjectsContainer, renderTodosContainer, renderProjectContent, onClick, onDashboardClick, onAddProject, onAddTodo, selectCard, selectIcon, selectIconTodo };
+    return { renderInbox, renderTodayTodos, renderUpcomingTodos, renderAnytimeTodos, renderProjectsDashboard, renderProjectsContainer, renderTodosContainer, renderProjectContent, onClick, onDashboardClick, onAddProject, onAddTodo, selectCard, selectIcon, selectIconTodo };
 })();
