@@ -1,4 +1,4 @@
-import {addDays} from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
+import {addDays} from 'date-fns';
 
 export function createTodo(title, priority, dueDate = addDays(new Date(), 1), completed = false, number = 0) {
     let _id = crypto.randomUUID();

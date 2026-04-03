@@ -1,7 +1,8 @@
-import { intervalToDuration, compareAsc } from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
+import { intervalToDuration, compareAsc } from 'date-fns';
 
 export const display = (function() {
     const dashboard = document.querySelector('.dashboard');
+    const hamburger = document.querySelector('.hamburger');
     const content = document.querySelector('.content');
     const projects = document.querySelector(".project-cards");
     
@@ -63,6 +64,27 @@ export const display = (function() {
         </div> `;
     }
 
+    function renderModal(text) {
+        return new Promise((res) => {
+            let dialog = document.createElement("dialog");
+            dialog.innerHTML = `
+            <form method="dialog">
+                <h3>${text}</h3>
+                <menu>
+                    <button value="no">No</button>
+                    <button value="default">Yes</button>
+                </menu>
+            </form>
+            `
+            content.appendChild(dialog);
+            dialog.showModal();
+            dialog.addEventListener('close', () => {
+                dialog.remove();
+                res(dialog.returnValue === 'default');
+            });
+        })
+    }
+
     function renderProjectsDashboard(proj){
         projects.innerHTML = "";
         proj.forEach((p) => {
@@ -85,7 +107,7 @@ export const display = (function() {
             div.innerHTML += `
                     <div id="icon" class="icon" data-id="${p.getId()}">
                         ${p.getTitle()}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="iconSvg" id="deleteProj" viewBox="0 0 24 24" width="20" height="20"><title>delete-circle</title><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M17,7H14.5L13.5,6H10.5L9.5,7H7V9H17V7M9,18H15A1,1 0 0,0 16,17V10H8V17A1,1 0 0,0 9,18Z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="#0b92e6" class="iconSvg" id="deleteProj" viewBox="0 0 24 24" width="20" height="20"><title>delete-circle</title><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M17,7H14.5L13.5,6H10.5L9.5,7H7V9H17V7M9,18H15A1,1 0 0,0 16,17V10H8V17A1,1 0 0,0 9,18Z" /></svg>
                     </div>
             `
 
@@ -165,10 +187,12 @@ export const display = (function() {
     function renderTodosContainer(todos){
         const todoContainer = document.querySelector("#todo");
         todoContainer.innerHTML = "";
+        let completedCount = 0;
+        todos.forEach(t => completedCount += 1 ? t.getCompleted() : 0);
         let div = document.createElement("div");
         todoContainer.innerHTML =
             `<div class="containerHeader">
-                    ToDos
+                    ToDos ${(completedCount / todos.length * 100).toFixed(2) || 0}% completed
                 </div>
                 `;
         div.classList.add("containerIcons");
@@ -224,37 +248,38 @@ export const display = (function() {
     }
 
     function onClick(controller){
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', async (e) => {
             const target = e.target;
-            if(target.closest('#addproj')){
+            if (target.closest('.hamburger')) {
+                hamburger.classList.toggle('cross');
+                dashboard.classList.toggle('hidden');
+            }
+            if (target.closest('#addproj')) {
                 displayAddProject();
-            }
-            else if(target.closest("#addtodo")){
+            } else if (target.closest("#addtodo")) {
                 displayAddTodo();
-            }
-            else if(target.closest("#deleteProj")){
-                if(confirm("Are you sure you want to delete this project?") === true)
+            } else if (target.closest("#deleteProj")) {
+                if (await renderModal("Are you sure you want to delete this project?") === true)
                     controller.handleDeleteProject(target);
-            }
-            else if(target.closest("#deleteTodo")){
-                if(confirm("Are you sure? This action cannot be undone.") === true)
+            } else if (target.closest("#deleteTodo")) {
+                if (await renderModal("Are you sure? This action cannot be undone.") === true)
                     controller.handleDeleteTodo(target);
-            }
-            else if(target.closest(".completeTodoBtn")){
-                if(confirm("Are you sure?") === true)
+            } else if (target.closest(".completeTodoBtn")) {
+                if (await renderModal("Are you sure?") === true)
                     controller.handleCompleteTodo(target.closest("#iconTodo"));
-            }
-            else if(target.closest("#icon")){
+            } else if (target.closest("#icon")) {
                 controller.handleSelectIcon(target);
-            }
-            else if(target.closest("#iconTodo")){
+            } else if (target.closest("#iconTodo")) {
                 controller.handleSelectIconTodo(target.closest("#iconTodo"));
-            }
-            else if(target.closest("#todoCheck")){
+            } else if (target.closest("#todoCheck")) {
                 controller.handleTodoCheck(target);
-            }
-            else
+            } else {
+                if(hamburger.classList.contains('cross') && !target.closest('.hamburger') && !target.closest('.dashboard')) {
+                    hamburger.classList.toggle('cross');
+                    dashboard.classList.toggle('hidden');
+                }
                 clearIconTodoSelection();
+            }
         })
     }
 

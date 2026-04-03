@@ -1,5 +1,5 @@
 import {createProject, createTodo} from "./domain.js";
-import {addMonths, addDays} from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
+import {addMonths, addDays} from 'date-fns';
 
 export const mockup = (function () {
     let projects = [];

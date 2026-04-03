@@ -1,9 +1,21 @@
+:root {
+    background-color: rgb(244, 244, 244);
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body{
     margin: 0;
+    padding: 0;
+    overflow-x: hidden;
     font-family: "Inter";
 }
 
 .page{
+    position: absolute;
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 4fr;
     grid-template-rows: 100vh;
@@ -14,7 +26,64 @@ body{
     background-color: rgba(192, 192, 192, 0.445);
 }
 
+.hamburger {
+    position: fixed;
+    top: 30px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 5px;
+    z-index: 2;
+}
 
+.hamburger_bar {
+    width: 35px;
+    height: 5px;
+    background-color: black;
+    border-radius: 10px;
+    transition: all 0.5s ease-in-out;
+}
+
+.hamburger_bar::before, .hamburger_bar::after {
+    content: "";
+    position: absolute;
+    height: 5px;
+    background-color: black;
+    border-radius: 10px;
+    transition: all 0.5s ease-in-out;
+}
+
+.hamburger_bar::before {
+    width: 40px;
+    transform: translateY(-10px);
+}
+
+.hamburger_bar::after {
+    width: 40px;
+    transform: translateY(10px);
+}
+
+.hamburger.cross .hamburger_bar {
+    transform: translateX(-50px);
+    background: transparent;
+}
+
+.hamburger.cross .hamburger_bar::before {
+    transform: rotate(45deg) translate(35px, -35px);
+}
+
+.hamburger.cross .hamburger_bar::after {
+    transform: rotate(-45deg) translate(35px, 35px);
+}
+
+.hidden {
+    position: absolute;
+    transform: translateX(-250px);
+    visibility: hidden;
+}
 
 .selectedIcon{
     border-left: 3px solid rgb(93, 92, 92);
@@ -95,9 +164,10 @@ body{
 }
 
 #iconTodo{
-    width: 200px;
+    width: 250px;
     /*background: #e7cf92;*/
     border-radius: 10px;
+    overflow: hidden;
     padding: 16px;
     display: flex;
     flex-direction: column;
@@ -123,6 +193,7 @@ body{
 .containerHeader{
     font-weight: 400;
     font-size: 20px;
+    padding: 0 10px;
     margin-bottom: 25px;
 }
 h3 {
@@ -245,8 +316,12 @@ button {
 
 
 .dashboard{
-    background-color: rgba(191, 191, 191, 0.452);
-    padding: 45px 40px;
+    position: fixed;
+    z-index: 1;
+    background-color: rgb(191 191 191 / 0.94);
+    border-bottom-right-radius: 12px;
+    padding: 85px 40px;
+    transition: all 0.5s ease-in-out;
 }
 
 .cards{
@@ -262,9 +337,9 @@ button {
 }
 
 .content{
-    background-color: rgb(244, 244, 244);
+    width: 100vw;
     border-left: 1px solid rgba(128, 128, 128, 0.267);
-    padding: 45px 40px;
+    padding: 95px 40px;
 }
 
 .selected{
@@ -302,12 +377,23 @@ form{
 }
 
 form select{
+    margin: 0 10px;
     width: 80px;
 }
 
+form textarea{
+    border: 1px solid black;
+    border-radius: 3px;
+}
+
 form button{
+    min-width: 60px;
     margin-top: 20px;
     width: auto;
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid black;
+    padding: 5px 10px;
 }
 /* Priority levels */
 .high{

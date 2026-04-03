@@ -23,7 +23,7 @@ export const repo = (function() {
             }
             projects.push(proj);
         }
-        console.log(projects);
+        //console.log(projects);
         number++;
     }
 

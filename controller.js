@@ -1,7 +1,7 @@
 import { display } from "./display.js";
 import {createProject, createTodo} from "./domain.js";
 import {repo} from "./repo.js";
-import {setMonth} from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
+import {addDays, addMonths, getTime, setMonth} from 'date-fns';
 
 export const controller = (function(){
     let selectedCardProj = 0;
@@ -53,14 +53,14 @@ export const controller = (function(){
     function handleToday(){
         let todos = [];
         repo.getProjects().forEach(p => p.getTodos().forEach(t => todos.push(t)));
-        todos = todos.filter(t => t.getDueDate() <= new Date());
+        todos = todos.filter(t => getTime(addDays(new Date(), 1)) >= getTime(t.getDueDate()) && getTime(t.getDueDate) >= getTime(new Date()));
         display.renderTodayTodos(todos);
     }
     
     function handleUpcoming(){
         let todos = [];
         repo.getProjects().forEach(p => p.getTodos().forEach(t => todos.push(t)));
-        todos = todos.filter(t => t.getDueDate() <= setMonth(new Date(), new Date().getMonth() + 1));
+        todos = todos.filter(t => getTime(addMonths(new Date(), 1)) >= getTime(t.getDueDate()) && getTime(t.getDueDate) >= getTime(addDays(new Date(), 1)));
         display.renderUpcomingTodos(todos);
     }
     
